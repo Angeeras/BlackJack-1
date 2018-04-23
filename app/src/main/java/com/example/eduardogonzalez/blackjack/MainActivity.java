@@ -1,11 +1,6 @@
 package com.example.eduardogonzalez.blackjack;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
-import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,11 +16,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.lib.*;
 import com.squareup.picasso.Picasso;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
     Deck deck;
@@ -175,9 +165,7 @@ public class MainActivity extends AppCompatActivity {
         Picasso.with(this).load(url).placeholder(R.mipmap.ic_launcher).into(image, new com.squareup.picasso.Callback(){
             @Override
             public void onSuccess() {
-
             }
-
             @Override
             public void onError() {
 
