@@ -12,6 +12,17 @@ public class Player {
           return cards.get(i);
      }
 
+     public ArrayList<Card> getCards() {
+          return cards;
+     }
+
+     public String[] getUrls() {
+         String[] urls = new String[cards.size()];
+         for (int i = 0; i < cards.size(); i++) {
+             urls[i] = cards.get(i).getUrl();
+         }
+         return urls;
+     }
      public int getCardLength() {
           return cards.size();
      }

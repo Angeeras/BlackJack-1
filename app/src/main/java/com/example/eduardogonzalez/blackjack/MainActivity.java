@@ -1,11 +1,11 @@
 package com.example.eduardogonzalez.blackjack;
 
-import android.app.VoiceInteractor;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
-import android.provider.ContactsContract;
+import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,20 +20,18 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.lib.*;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
     Deck deck;
     Player player1;
     Dealer dealer;
-    Player current = new Player();
-    final ImageView playerCard1 = findViewById(R.id.playerCard1);
-    final ImageView playerCard2 = findViewById(R.id.playerCard2);
+    private Player current = new Player();
     private static RequestQueue requestQueue;
 
     @Override
@@ -43,18 +41,23 @@ public class MainActivity extends AppCompatActivity {
         requestQueue = Volley.newRequestQueue(this);
         shuffleAPICall();
 
-
+        final ImageView playerCard1 = findViewById(R.id.playerCard1);
         playerCard1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, Main2Activity.class));
+                Intent i = new Intent(MainActivity.this, Main2Activity.class);
+                i.putExtra("Cards", current.getUrls());
+                startActivity(i);
             }
         });
 
+        final ImageView playerCard2 = findViewById(R.id.playerCard2);
         playerCard2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, Main2Activity.class));
+                Intent i = new Intent(MainActivity.this, Main2Activity.class);
+                i.putExtra("Cards", current.getUrls());
+                startActivity(i);
             }
         });
 
@@ -70,8 +73,16 @@ public class MainActivity extends AppCompatActivity {
         draw.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("thes", "i was called");
                 drawAPICall();
+            }
+        });
+
+        final Button reset = (Button) findViewById(R.id.resetBtn);
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, MainActivity.class);
+                startActivity(i);
             }
         });
     }
@@ -91,7 +102,6 @@ public class MainActivity extends AppCompatActivity {
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.d("that", "htere is an eeroro");
                 }
             });
             requestQueue.add(jsonObjectRequest);
@@ -101,9 +111,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void shuffleAPICall() {
-        Log.d("this", "shuffle");
         try {
-            Log.d("this", "i was called");
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                     Request.Method.GET,
                     "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1",
@@ -111,25 +119,22 @@ public class MainActivity extends AppCompatActivity {
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            Log.d("this", "i got an object");
                             getDeckId(response);
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.d("that", "htere is an eeroro");
                 }
             });
             requestQueue.add(jsonObjectRequest);
         } catch (Exception e) {
-            Log.d("that", "im here");
         }
     }
 
     void getDeckId(JSONObject jsonObject) {
-        Log.d("this", "getDeckId");
         try {
             String deckId = jsonObject.getString("deck_id");
+            Log.d("this", deckId + "i am here");
             deck = new Deck(deckId);
 
         } catch (JSONException ignored) {
@@ -158,14 +163,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     void drawImage() {
-        try {
-
-            Bitmap bitmap = BitmapFactory.decodeStream((InputStream)new URL(current.getCard(current.getCardLength() - 1).getUrl()).getContent());
-            playerCard1.setImageBitmap(bitmap);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        ImageView cardPlayer1 = findViewById(R.id.playerCard1);
+        ImageView cardPlayer2 = findViewById(R.id.playerCard2);
+        loadFromUrl(current.getCard(current.getCardLength() - 1).getUrl(), cardPlayer1);
+        if (current.getCardLength() >= 2) {
+            loadFromUrl(current.getCard(current.getCardLength() - 2).getUrl(), cardPlayer2);
         }
+
+    }
+    public void loadFromUrl(final String url, ImageView image) {
+        Picasso.with(this).load(url).placeholder(R.mipmap.ic_launcher).into(image, new com.squareup.picasso.Callback(){
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        });
     }
 }
